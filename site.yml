@@ -1,0 +1,20 @@
+---
+- name: Provision
+  hosts: "all"
+  gather_facts: no
+  vars_files:
+    - vars/vars.yml
+  roles:
+    - init
+    - zerotier
+    - docker
+    - role: timecapsule
+      ansible_user: "{{ user.name }}"
+    - role: transmission
+      ansible_user: "{{ user.name }}"
+    - role: plex
+      ansible_user: "{{ user.name }}"
+    - role: youtube-dl
+      ansible_user: "{{ user.name }}"
+    - role: postgres
+      ansible_user: "{{ user.name }}"

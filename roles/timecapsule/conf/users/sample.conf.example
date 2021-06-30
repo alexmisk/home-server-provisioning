@@ -1,0 +1,8 @@
+# Fill with actual values and rename to xxx.conf
+TM_USERNAME=<username>
+TM_GROUPNAME=timecapsule
+PASSWORD=<pwd>
+SHARE_NAME=<name>
+VOLUME_SIZE_LIMIT="1 T"
+TM_UID=1000
+TM_GID=1000

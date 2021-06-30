@@ -1,0 +1,37 @@
+---
+- name: Setup Plex folders
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ user.name }}"
+    mode: '0777'
+  loop:
+    - "{{ folder.config }}/plex"
+    - "{{ folder.data }}/files/!series"
+    - "{{ folder.data }}/files/!movies"
+
+- name: Start Plex
+  docker_compose:
+    project_name: plex
+    definition:
+      version: "2.1"
+      services:
+        plex:
+          image: ghcr.io/linuxserver/plex
+          container_name: plex
+          network_mode: host
+          environment:
+            - PUID=1000
+            - PGID=1000
+            - VERSION=docker
+          volumes:
+            - "{{ folder.config }}/plex:/config"
+            - "{{ folder.data }}/files/!series:/series"
+            - "{{ folder.data }}/files/!movies:/movies"
+          restart: unless-stopped
+          logging: &default_logging
+            driver: json-file
+            options:
+              max-size: "1m"
+              max-file: "5"

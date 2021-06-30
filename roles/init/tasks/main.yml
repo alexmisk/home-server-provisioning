@@ -1,0 +1,71 @@
+---
+- name: Set repository mirrors
+  raw: |
+        cat > /etc/apk/repositories << EOF; $(echo)
+        http://mirror.yandex.ru/mirrors/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
+        http://mirror.yandex.ru/mirrors/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
+        EOF
+
+- name: Install Python
+  raw: apk update && apk add python3
+
+- name: Set hostname to `{{ host.name }}`
+  hostname:
+    name:  "{{ host.name }}"
+
+- name: Set timezone to Europe/Moscow
+  package:
+    name: tzdata
+
+- copy:
+    remote_src: yes
+    src: /usr/share/zoneinfo/Europe/Moscow
+    dest: /etc/localtime
+
+- package:
+    name: tzdata
+    state: absent
+
+- name: Install sud@ package
+  package:
+    name: sudo
+    state: present
+
+- name: Create user
+  user:
+    name: "{{ user.name }}"
+    password: "{{ user.pass }}"
+    createhome: yes
+
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Add sudoers users to 'wheel' group
+  user:
+    name: "{{ user.name }}"
+    groups: wheel
+    append: yes
+
+- name: Set up authorized keys for {{ user.name }}
+  authorized_key:
+    user: "{{ user.name }}"
+    state: present
+    exclusive: True
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+- name: Set up data folder
+  file:
+    path: "{{ folder.data }}"
+    state: directory
+    owner: "{{ user.name }}"
+    mode: 0777

@@ -1,0 +1,21 @@
+# Fill this file with actual values and rename it to vars.yml
+---
+host:
+  name: <hostname>
+user:
+  name: <username>
+  pass: <user_pwd>
+  uid: 1000
+  gid: 1000
+folder:
+  config: ~/config
+  data: /mnt/data
+zerotier:
+  network: <network_id>
+postgres:
+  pwd: asonetuh
+feeds:
+    - name: '<podcast_name>'
+      playlist: '<youtube-link>'
+      dir: 'podcasts'
+      number_of_episodes_to_keep: '100'

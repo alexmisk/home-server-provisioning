@@ -1,0 +1,23 @@
+---
+- name: Setup modprobe
+  modprobe:
+    name: tun
+    state: present
+
+- name: Install Zerotier
+  package:
+    name:
+      - zerotier-one
+    state: present
+
+- name: Run Zerotier
+  service:
+    name: zerotier-one
+    enabled: yes
+    state: started
+
+- pause:
+    seconds: 10
+
+- name: join {{ zerotier.network }}
+  command: "zerotier-cli join {{ zerotier.network }}"

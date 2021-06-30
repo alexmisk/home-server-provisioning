@@ -1,0 +1,34 @@
+---
+- name: Install packages
+  package:
+    update_cache: yes
+    name:
+      - gcc
+      - python3
+      - py3-pip
+      - python3-dev
+      - libffi-dev
+      - libc-dev
+      - make
+      - rust
+      - openssl-dev
+      - cargo
+      - docker
+    state: present
+
+- name: Start docker daemon
+  service:
+    name: docker
+    enabled: yes
+    state: started
+
+- name: Install docker modules for python
+  pip:
+    name:
+      - docker-compose
+
+- name: Add user {{ user.name }} to docker group
+  user:
+    name: "{{ user.name }}"
+    groups: docker
+    append: yes

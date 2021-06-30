@@ -1,0 +1,41 @@
+---
+- name: Setup Transmission folders
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ user.name }}"
+    mode: '0777'
+  loop:
+    - "{{ folder.config }}/transmission"
+    - "{{ folder.data }}/files/!downloads/_watch"
+
+- name: Start Transmission
+  docker_compose:
+    project_name: transmission
+    definition:
+      version: "2.1"
+      services:
+        transmission:
+          image: ghcr.io/linuxserver/transmission
+          container_name: transmission
+          environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Europe/Moscow
+            - http_proxy=http://px1.blockme.site:3128
+          volumes:
+            - "{{ folder.config }}/transmission:/config"
+            - "{{ folder.data }}/files:/files"
+            - "{{ folder.data }}/files/!downloads:/downloads"
+            - "{{ folder.data }}/files/!downloads/_watch:/watch"
+          ports:
+            - 9091:9091
+            - 51413:51413
+            - 51413:51413/udp
+          restart: unless-stopped
+          logging: &default_logging
+            driver: json-file
+            options:
+              max-size: "1m"
+              max-file: "5"

@@ -1,0 +1,28 @@
+---
+- name: Run youtube-dl containers
+  docker_compose:
+    project_name: "{{ item.name }}"
+    definition:
+      version: '3.2'
+      services:
+        podcast:
+          container_name: "{{ item.name }}"
+          image: ghcr.io/alexmisk/yt-downloader:latest
+          restart: always
+          volumes:
+            - "~/{{ item.dir }}/{{ item.name }}:/out"
+          environment:
+            - PLAYLIST={{ item.playlist }}
+            - FETCH_INTERVAL={{ item.fetch_interval | default('86400') }}
+            - FILENAME_TEMPLATE={{ item.filename_template | default('%(id)s.%(ext)s') }}
+            - AUDIO_QUALITY={{ item.audio_quality | default('9') }}
+            - NUMBER_OF_ITEMS_TO_DOWNLOAD={{ item.number_of_items_to_download | default('-1') }}
+            - NUMBER_OF_EPISODES_TO_KEEP={{ item.number_of_episodes_to_keep | default('-1') }}
+          logging: &default_logging
+            driver: json-file
+            options:
+              max-size: "1m"
+              max-file: "5"
+  with_items:
+    - "{{ feeds }}"
+
