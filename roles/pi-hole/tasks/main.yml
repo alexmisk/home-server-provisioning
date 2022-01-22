@@ -1,0 +1,39 @@
+---
+- name: Setup Pi-hole folders
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ user.name }}"
+    mode: '0777'
+  loop:
+    - "{{ folder.config }}/pi-hole/etc-pihole/"
+    - "{{ folder.config }}/pi-hole/etc-dnsmasq.d/"
+
+- name: Start Pi-hole
+  docker_compose:
+    project_name: pi-hole
+    definition:
+      version: "3"
+          # More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
+      services:
+        pi-hole:
+          container_name: pi-hole
+          image: pihole/pihole:latest
+          ports:
+            - "53:53/tcp"
+            - "53:53/udp"
+            - "67:67/udp"
+            - "80:80/tcp"
+          environment:
+            TZ: 'Europe/Moscow'
+            WEBPASSWORD: '{{ pihole.password }}'
+          volumes:
+            - '{{ folder.config }}/pi-hole/etc-pihole/:/etc/pihole/'
+            - '{{ folder.config }}/etc-dnsmasq.d/:/etc/dnsmasq.d/'
+          restart: unless-stopped
+          logging: &default_logging
+            driver: json-file
+            options:
+              max-size: "1m"
+              max-file: "5"

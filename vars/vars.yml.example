@@ -17,6 +17,8 @@ postgres:
 minio:
   user: <username>
   password: <password>
+pihole:
+  password: <password>
 feeds:
     - name: '<podcast_name>'
       playlist: '<youtube-link>'
