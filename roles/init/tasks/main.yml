@@ -10,8 +10,7 @@
   raw: apk update && apk add python3
 
 - name: Set hostname to `{{ host.name }}`
-  hostname:
-    name:  "{{ host.name }}"
+  raw: echo "{{ host.name }}" > /etc/hostname && hostname -F /etc/hostname
 
 - name: Set timezone to Europe/Moscow
   package:
@@ -26,7 +25,7 @@
     name: tzdata
     state: absent
 
-- name: Install sud@ package
+- name: Install sudo package
   package:
     name: sudo
     state: present
