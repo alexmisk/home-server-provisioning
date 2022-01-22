@@ -18,3 +18,5 @@
       ansible_user: "{{ user.name }}"
     - role: postgres
       ansible_user: "{{ user.name }}"
+    - role: minio
+      ansible_user: "{{ user.name }}"

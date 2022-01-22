@@ -1,0 +1,39 @@
+---
+- name: Setup Minio folders
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ user.name }}"
+    mode: '0777'
+  loop:
+    - "{{ folder.data }}/minio"
+
+- name: Start Minio
+  docker_compose:
+    project_name: minio
+    definition:
+      version: "2.1"
+      services:
+        minio:
+          image: minio/minio:latest
+          container_name: minio
+          environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Europe/Moscow
+          volumes:
+            - "{{ folder.data }}/minio:/data"
+          ports:
+            - 9000:9000
+            - 9001:9001
+          environment:
+            MINIO_ROOT_USER: "{{ minio.user }}"
+            MINIO_ROOT_PASSWORD: "{{ minio.password }}"
+          restart: unless-stopped
+          command: server --console-address ":9001" /data
+          logging: &default_logging
+            driver: json-file
+            options:
+              max-size: "1m"
+              max-file: "5"
