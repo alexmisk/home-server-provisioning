@@ -1,7 +1,7 @@
 ---
 - name: Provision
   hosts: "all"
-  gather_facts: no
+  gather_facts: yes
   vars_files:
     - vars/vars.yml
   roles:
@@ -13,8 +13,6 @@
     - role: transmission
       ansible_user: "{{ user.name }}"
     - role: plex
-      ansible_user: "{{ user.name }}"
-    - role: youtube-dl
       ansible_user: "{{ user.name }}"
     - role: postgres
       ansible_user: "{{ user.name }}"
