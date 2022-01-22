@@ -2,4 +2,5 @@
 *.swp
 hosts
 vars.yml
+*.conf.txt
 *.conf
